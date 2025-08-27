@@ -7,8 +7,7 @@ on:
 
 jobs:
   terraform:
-    runs-on:  [self-hosted, Windows, X64]
-
+    runs-on: [self-hosted, Windows, X64]
 
     steps:
       # Step 1: Checkout the code
@@ -21,25 +20,30 @@ jobs:
         with:
           terraform_version: 1.5.0
 
-      # Step 3: Azure Login using Service Principal
+      # ✅ Step 3: Set PowerShell Execution Policy (Fix for your error)
+      - name: Set PowerShell Execution Policy
+        run: |
+          Set-ExecutionPolicy RemoteSigned -Scope Process -Force
+        shell: powershell
+
+      # Step 4: Azure Login using Service Principal
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Step 4: Terraform Init
+      # Step 5: Terraform Init
       - name: Terraform Init
         run: terraform init
 
-      # Step 5: Terraform Validate
+      # Step 6: Terraform Validate
       - name: Terraform Validate
         run: terraform validate
 
-      # Step 6: Terraform Plan
+      # Step 7: Terraform Plan
       - name: Terraform Plan
         run: terraform plan -out=tfplan
 
-      # Step 7: Terraform Apply
+      # Step 8: Terraform Apply
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
-
